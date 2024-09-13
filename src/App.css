@@ -1,0 +1,73 @@
+.css-selector {
+  background: linear-gradient(338deg, #97a6a3, #151616, #c15a14);
+  background-size: 600% 600%;
+  -webkit-animation: AnimationName 12s ease infinite;
+  -moz-animation: AnimationName 12s ease infinite;
+  -o-animation: AnimationName 12s ease infinite;
+  animation: AnimationName 12s ease infinite;
+  height: 100%;
+  width: 100%;
+}
+
+@-webkit-keyframes AnimationName {
+  0% {
+    background-position: 35% 0%;
+  }
+  50% {
+    background-position: 66% 100%;
+  }
+  100% {
+    background-position: 35% 0%;
+  }
+}
+@-moz-keyframes AnimationName {
+  0% {
+    background-position: 35% 0%;
+  }
+  50% {
+    background-position: 66% 100%;
+  }
+  100% {
+    background-position: 35% 0%;
+  }
+}
+@-o-keyframes AnimationName {
+  0% {
+    background-position: 35% 0%;
+  }
+  50% {
+    background-position: 66% 100%;
+  }
+  100% {
+    background-position: 35% 0%;
+  }
+}
+@keyframes AnimationName {
+  0% {
+    background-position: 35% 0%;
+  }
+  50% {
+    background-position: 66% 100%;
+  }
+  100% {
+    background-position: 35% 0%;
+  }
+}
+
+.centered-box {
+  display: flex;
+  justify-content: center;
+}
+
+.box-content {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  margin: 5rem;
+}
+
+.box-content-timer{
+  max-width: 12rem;
+  max-height: 12rem;
+}
