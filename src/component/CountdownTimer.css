@@ -35,5 +35,16 @@
     opacity: 0;
   }
 
+  .counterBox{
+    font-size: xxx-large;
+    font-weight: 400;
+    background-color: black;
+    color: aliceblue;
+  }
+
+  .smoke{
+    color: red;
+  }
+
 
   

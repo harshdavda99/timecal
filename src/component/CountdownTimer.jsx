@@ -13,13 +13,14 @@ const CountdownTimer = () => {
   const [time, setTime] = useState(remainingTime);
   const [launch, setLaunch] = useState(false);
 
+  function timeToMinutes(timeStr) {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    return hours * 60 + minutes;
+  }
+
   function calculateRemainingTime(officeInTime, workingHours, totalBreak) {
     if ((officeInTime, workingHours, totalBreak)) {
       // Helper function to convert time strings (HH:MM) to minutes
-      function timeToMinutes(timeStr) {
-        const [hours, minutes] = timeStr.split(":").map(Number);
-        return hours * 60 + minutes;
-      }
 
       // Calculate in-time, working hours, and total break in minutes
       const inTimeMinutes = timeToMinutes(officeInTime);
@@ -35,9 +36,8 @@ const CountdownTimer = () => {
       const remainingMinutes = targetTimeMinutes - currentTimeMinutes;
 
       return Math.max(remainingMinutes, 0) * 60;
-    } 
-    else {
-      return 0
+    } else {
+      return 0;
     }
   }
 
@@ -64,12 +64,24 @@ const CountdownTimer = () => {
   const timer = `${hours.toString().padStart(2, "0")}:${minutes
     .toString()
     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  console.log("timer", timeToMinutes(timer));
   return (
     <div className=" text-center position-relative">
-      <div className={` text-danger countdown ${launch ? "fade-out" : ""}`}>
-        <div className="border p-2 d-inline-block">{timer}</div>
-      </div>
-      <h1 className="smoke">Rocket Launch Countdown</h1>
+      {timeToMinutes(timer) < 15 ? (
+        <div className={` text-danger countdown ${launch ? "fade-out" : ""}`}>
+          <h1 className="">
+            You can leave <span className="text-white"> {timer}</span> minutes
+            early.{" "}
+          </h1>
+        </div>
+      ) : (
+        <div className={` text-danger countdown ${launch ? "fade-out" : ""}`}>
+          <div className="counterBox border mb-3 p-2 d-inline-block">
+            {timer}
+          </div>
+        </div>
+      )}
+
       {launch ? (
         <div className="rocket-div  ">
           <img
