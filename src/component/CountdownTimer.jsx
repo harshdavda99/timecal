@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CountdownTimer.css"; // Import your custom CSS file for animations
-import rocketImage from "../../public/assets/rocket.gif";
 import rocketImage1 from "../../public/assets/rockets.gif";
-const SmaokeImage = `https://toppng.com/uploads/preview/rocket-rocket-launches-gif-11563612363fdemn3gstk.png`;
 
 const CountdownTimer = () => {
   const getLocalData = JSON.parse(localStorage?.getItem("timelogs"));
@@ -28,7 +26,7 @@ const CountdownTimer = () => {
       const workingMinutes = timeToMinutes(workingHours);
       const breakMinutes = timeToMinutes(totalBreak);
 
-      const targetTimeMinutes = inTimeMinutes + workingMinutes - breakMinutes;
+      const targetTimeMinutes = inTimeMinutes + workingMinutes + breakMinutes;
 
       const currentDate = new Date();
       const currentTimeMinutes =
