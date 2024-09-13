@@ -44,7 +44,6 @@ const CountdownTimer = () => {
   }
 
   useEffect(() => {
-    console.log("getLocalData", getLocalData);
     const timer = setInterval(() => {
       setTime((prevTime) => {
         if (prevTime === 0) {
