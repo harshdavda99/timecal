@@ -1,175 +1,104 @@
-import { useState, useRef, useEffect } from "react";
-import { HiChevronDown } from "react-icons/hi";
-import { FaPlus, FaFileUpload } from "react-icons/fa";
-import { IoIosSend } from "react-icons/io";
+import React, { useState } from "react";
+import { FiMenu, FiX } from "react-icons/fi";
+import { GoSidebarExpand , GoSidebarCollapse } from "react-icons/go";
+import { MdChevronLeft } from "react-icons/md"
+import ChatInput from "./ChatInput";
 
-export default function ChatInput() {
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [showFileMenu, setShowFileMenu] = useState(false);
+const chats = ["What is react js", "Create react app"];
+const suggestions = [
+    {
+        title: "Rewrite this to sound more professional and less verbose",
+        desc: "Improve your writing",
+    },
+    {
+        title: "What is the purpose of {0}?",
+        desc: "What is the purpose of this file?",
+    },
+    {
+        title: "List key points from Component List.xlsx",
+        desc: "Understand the main points",
+    },
+    {
+        title: "Summarize file",
+        desc: "Get an overview",
+    },
+    {
+        title: "Create alt text to describe this image and its context to someone",
+        desc: "Make it accessible",
+    },
+    {
+        title: "Write a compelling intro paragraph to doc",
+        desc: "Draft an introduction",
+    },
+];
+
+export default function CopilotChatUI() {
     const [message, setMessage] = useState("");
-    const textareaRef = useRef(null);
-    const dropdownRef = useRef();
-    const fileRef = useRef();
-
-    // Close dropdown on outside click
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target)
-            ) {
-                setShowDropdown(false);
-                setShowFileMenu(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    // Handle textarea height
-    useEffect(() => {
-        const textarea = textareaRef.current;
-        if (textarea) {
-            textarea.style.height = "auto";
-            const maxHeight = 96; // ~3 lines
-            textarea.style.overflowY =
-                textarea.scrollHeight > maxHeight ? "scroll" : "hidden";
-            textarea.style.height = `${Math.min(
-                textarea.scrollHeight,
-                maxHeight
-            )}px`;
-        }
-    }, [message]);
-
-    const handleFileSelect = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            console.log("Selected file:", file);
-            // Handle file upload logic here
-        }
-    };
+    const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
 
     return (
-        <div className="w-full flex justify-center px-4 mt-6">
-            <div className="w-full max-w-3xl bg-white rounded-3xl shadow-md px-4 pt-4 pb-2 relative">
-                {/* Textarea */}
-                <textarea
-                    ref={textareaRef}
-                    rows={1}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            // sendMessage();
-                        }
-                    }}
-                    placeholder="Ask anything..."
-                    className="w-full bg-transparent outline-none resize-none text-base placeholder-gray-400 overflow-hidden"
-                />
-
-                {/* Bottom Bar */}
-                <div className="flex items-center justify-between mt-3">
-                    {/* Dropdown Toggle */}
-                    <div
-                        className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => setShowDropdown(!showDropdown)}
-                    >
-                        <img
-                            src="https://img.icons8.com/color/48/000000/artificial-intelligence.png"
-                            alt="icon"
-                            className="w-5 h-5"
-                        />
-                        <span className="text-sm font-medium">Think Deeper</span>
-                        <HiChevronDown className="text-sm" />
-                    </div>
-
-                    {/* Right Buttons */}
-                    <div className="flex items-center gap-3 relative">
-                        {/* File Upload */}
+        <div className="min-h-screen flex font-sans text-gray-800">
+            <div className="flex flex-col flex-1">
+                {/* Header */}
+                <header className="flex items-center justify-between bg-white border-b px-6 py-4 shadow-sm">
+                    <h1 className="text-2xl font-semibold">Welcome Harsh, how can I help?</h1>
+                    <div>
                         <button
-                            className="text-gray-600 hover:text-black"
-                            onClick={() => setShowFileMenu(!showFileMenu)}
+                            className="p-2 mx-2 border rounded text-xl text-gray-700 hover:text-black"
+                            // onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
                         >
-                            <FaPlus className="text-lg" />
+                            <FiMenu />
                         </button>
+                        <button
+                            className="p-2 mx-2 border rounded text-xl text-gray-700 hover:text-black"
+                            onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
+                        >
+                              {rightSidebarOpen ? <GoSidebarCollapse /> : <GoSidebarExpand />}
+                        </button>
+                    </div>
+                </header>
 
-                        {/* File Upload Menu */}
-                        {showFileMenu && (
-                            <div
-                                ref={dropdownRef}
-                                className="absolute bottom-12 w-40 right-10 bg-white shadow-md p-2 rounded-md z-50"
-                            >
+                {/* Body below header */}
+                <div
+                    className={`flex-1 flex justify-center px-6 py-10 overflow-y-auto transition-all duration-300 ${
+                        rightSidebarOpen ? "bg-white" : "bg-gray-100"
+                    }`}
+                >
+                    <div className="w-full max-w-6xl">
+                        {/* Chat Input */}
+                        <ChatInput />
+
+                        {/* Suggestions */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {suggestions.map((item, idx) => (
                                 <div
-                                    className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer rounded-md"
-                                    onClick={() => fileRef.current.click()}
+                                    key={idx}
+                                    className="p-4 border rounded-lg shadow-sm hover:shadow-md transition cursor-pointer bg-white"
                                 >
-                                    <FaFileUpload className="text-gray-600" />
-                                    <span className="text-sm">Upload File</span>
+                                    <div className="text-sm text-blue-600 font-semibold mb-1">💬 {item.title}</div>
+                                    <p className="text-gray-500 text-sm">{item.desc}</p>
                                 </div>
-                            </div>
-                        )}
-                        <input
-                            type="file"
-                            ref={fileRef}
-                            onChange={handleFileSelect}
-                            className="hidden"
-                        />
-
-                        {/* Send Button */}
-                        <button className="bg-orange-200 hover:bg-orange-300 p-2 rounded-full text-white">
-                            <IoIosSend className="text-orange-600 text-xl" />
-                        </button>
+                            ))}
+                        </div>
                     </div>
-
-                    
                 </div>
-
-                {/* Dropdown Menu */}
-                {showDropdown && (
-                    <div
-                        ref={dropdownRef}
-                        className="absolute bottom-16 left-4 w-80 bg-white shadow-lg rounded-lg p-3 z-50"
-                    >
-                        <DropdownItem
-                            title="Quick response"
-                            desc="Best for everyday conversation"
-                            badge="2-3 sec"
-                        />
-                        <DropdownItem
-                            title="Think Deeper"
-                            desc="Better for complex topics"
-                            badge="~30 sec"
-                            selected
-                        />
-                        <DropdownItem
-                            title="Deep Research"
-                            desc="Detailed + reference"
-                            badge="~10 min"
-                            newBadge
-                        />
-                    </div>
-                )}
             </div>
+
+            {/* Right Sidebar */}
+            {rightSidebarOpen && (
+                <div className="w-64 bg-gray-50 border-l px-4 py-6">
+                    <div className="text-base font-bold mb-2">Chats</div>
+                    <div className="text-xs text-gray-500 mb-1">Today</div>
+                    <ul className="space-y-1 text-sm">
+                        {chats.map((chat, index) => (
+                            <li key={index} className="text-blue-600 hover:underline cursor-pointer">
+                                {chat}
+                            </li>
+                        ))}
+                    </ul>
+                    <button className="mt-3 text-xs text-blue-600 hover:underline">See more</button>
+                </div>
+            )}
         </div>
     );
 }
-
-function DropdownItem({ title, desc, badge, newBadge = false, selected = false }) {
-    return (
-        <div className="flex justify-between items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer">
-            <div>
-                <div className="font-medium">{title}</div>
-                <div className="text-xs text-gray-500">{desc}</div>
-            </div>
-            <div className="flex items-center gap-2">
-                {newBadge && (
-                    <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">New</span>
-                )}
-                <span className="text-xs bg-gray-200 px-2 py-0.5 rounded-full">{badge}</span>
-                <input type="radio" name="mode" checked={selected} readOnly />
-            </div>
-        </div>
-    );
-}
-
