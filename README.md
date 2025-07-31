@@ -1,184 +1,142 @@
-import { useState, useRef, useEffect } from "react";
-import { HiChevronDown } from "react-icons/hi";
-import { FaPlus, FaFileUpload } from "react-icons/fa";
-import { IoIosSend } from "react-icons/io";
+import React, { useState } from "react";
+import { FiTrash, FiUpload, FiChevronDown, FiChevronRight } from "react-icons/fi";
 
-export default function ChatInput() {
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [showFileMenu, setShowFileMenu] = useState(false);
-    const [message, setMessage] = useState("");
-    const textareaRef = useRef(null);
-    const dropdownRef = useRef();
-    const fileMenuRef = useRef();
-    const fileRef = useRef();
-    const justToggledRef = useRef(false);
+const ChatFilesAccordion = () => {
+  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isFilesOpen, setIsFilesOpen] = useState(false);
+  const [chatExpanded, setChatExpanded] = useState(false);
+  const [filesExpanded, setFilesExpanded] = useState(false);
 
-    // Prevent dropdowns from closing on toggle/double click
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (justToggledRef.current) {
-                justToggledRef.current = false;
-                return;
-            }
+  const chatItems = [
+    { id: 1, text: "How tosss install React?" },
+    { id: 2, text: "Explain JSX." },
+    { id: 3, text: "What is useEffect?" },
+    { id: 4, text: "What is state?" },
+    { id: 5, text: "Props vs State?" },
+    { id: 6, text: "What is context API?" },
+    { id: 7, text: "How to manage global state?" },
+    { id: 8, text: "React vs Angular?" },
+    { id: 9, text: "React performance optimization?" },
+    { id: 10, text: "Lazy loading in React?" },
+  ];
 
-            const clickedDropdown = dropdownRef.current?.contains(event.target);
-            const clickedFile = fileMenuRef.current?.contains(event.target);
+  const fileItems = [
+    { id: 1, name: "Resumes.pdf", date: "Uploaded on July 10, 2025" },
+    { id: 2, name: "Portfolio.zip", date: "Uploaded on July 28, 2025" },
+    { id: 3, name: "CoverLetter.docx", date: "Uploaded on July 29, 2025" },
+    { id: 4, name: "Photo.png", date: "Uploaded on July 29, 2025" },
+    { id: 5, name: "IDCard.pdf", date: "Uploaded on July 29, 2025" },
+    { id: 6, name: "Certificate.pdf", date: "Uploaded on July 29, 2025" },
+    { id: 7, name: "OfferLetter.pdf", date: "Uploaded on July 29, 2025" },
+    { id: 8, name: "Transcript.pdf", date: "Uploaded on July 30, 2025" },
+    { id: 9, name: "Invoice2025.pdf", date: "Uploaded on July 30, 2025" },
+    { id: 10, name: "Presentation.pptx", date: "Uploaded on July 30, 2025" },
+  ];
 
-            if (!clickedDropdown && !clickedFile) {
-                setShowDropdown(false);
-                setShowFileMenu(false);
-            }
-        };
+  const visibleChats = chatExpanded ? chatItems : chatItems.slice(0, 5);
+  const visibleFiles = filesExpanded ? fileItems : fileItems.slice(0, 5);
 
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    // Auto-resize textarea
-    useEffect(() => {
-        const textarea = textareaRef.current;
-        if (textarea) {
-            textarea.style.height = "auto";
-            const maxHeight = 96; // ~3 lines
-            textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "scroll" : "hidden";
-            textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
-        }
-    }, [message]);
-
-    const handleFileSelect = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            console.log("Selected file:", file);
-            // Upload logic here
-        }
-    };
-
-    return (
-        <div className="w-full flex justify-center px-4 mt-6">
-            <div className="w-full max-w-3xl bg-white rounded-3xl shadow-md px-4 pt-4 pb-2 relative">
-                {/* Textarea */}
-                <textarea
-                    ref={textareaRef}
-                    rows={1}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            // sendMessage();
-                        }
-                    }}
-                    placeholder="Ask anything..."
-                    className="w-full bg-transparent outline-none resize-none text-base placeholder-gray-400 overflow-hidden"
-                />
-
-                {/* Bottom Bar */}
-                <div className="flex items-center justify-between mt-3">
-                    {/* Dropdown Toggle */}
+  return (
+    <div className="space-y-6 p-4">
+      {/* Chat Section */}
+      <div className="border rounded-lg overflow-hidden">
+        <button
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className="w-full flex justify-between items-center px-4 py-3 bg-gray-100 font-semibold text-gray-800"
+        >
+          <span>💬 Chat</span>
+          {isChatOpen ? <FiChevronDown /> : <FiChevronRight />}
+        </button>
+        {isChatOpen && (
+          <div>
+            {chatItems.length === 0 ? (
+              <p className="text-center text-gray-500 py-4">No chats available</p>
+            ) : (
+              <>
+                <div className="max-h-60 overflow-y-auto divide-y">
+                  {visibleChats.map((chat) => (
                     <div
-                        className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => {
-                            justToggledRef.current = true;
-                            setShowDropdown(!showDropdown);
-                            setShowFileMenu(false);
-                        }}
+                      key={chat.id}
+                      className="flex justify-between items-center px-4 py-2"
                     >
-                        <img
-                            src="https://img.icons8.com/color/48/000000/artificial-intelligence.png"
-                            alt="icon"
-                            className="w-5 h-5"
-                        />
-                        <span className="text-sm font-medium">Think Deeper</span>
-                        <HiChevronDown className="text-sm" />
+                      <span className="text-gray-700">{chat.text}</span>
+                      <FiTrash
+                        className="text-red-500 hover:text-red-700 cursor-pointer"
+                        title="Delete"
+                        onClick={() => alert(`Delete chat: ${chat.text}`)}
+                      />
                     </div>
-
-                    {/* Right Buttons */}
-                    <div className="flex items-center gap-3 relative">
-                        {/* File Upload Toggle */}
-                        <button
-                            className="text-gray-600 hover:text-black"
-                            onClick={() => {
-                                justToggledRef.current = true;
-                                setShowFileMenu(!showFileMenu);
-                                setShowDropdown(false);
-                            }}
-                        >
-                            <FaPlus className="text-lg" />
-                        </button>
-
-                        {/* File Menu */}
-                        {showFileMenu && (
-                            <div
-                                ref={fileMenuRef}
-                                className="absolute bottom-12 w-40 right-10 bg-white shadow-md p-2 rounded-md z-50"
-                            >
-                                <div
-                                    className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer rounded-md"
-                                    onClick={() => fileRef.current.click()}
-                                >
-                                    <FaFileUpload className="text-gray-600" />
-                                    <span className="text-sm">Upload File</span>
-                                </div>
-                            </div>
-                        )}
-                        <input
-                            type="file"
-                            ref={fileRef}
-                            onChange={handleFileSelect}
-                            className="hidden"
-                        />
-
-                        {/* Send Button */}
-                        <button className="bg-orange-200 hover:bg-orange-300 p-2 rounded-full text-white">
-                            <IoIosSend className="text-orange-600 text-xl" />
-                        </button>
-                    </div>
+                  ))}
                 </div>
+                {chatItems.length > 5 && (
+                  <button
+                    onClick={() => setChatExpanded(!chatExpanded)}
+                    className="w-full text-sm text-blue-600 hover:underline py-2 text-center"
+                  >
+                    {chatExpanded ? "See less" : "See more"}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
-                {/* Dropdown Menu */}
-                {showDropdown && (
+      {/* Files Section */}
+      <div className="border rounded-lg overflow-hidden">
+        <button
+          onClick={() => setIsFilesOpen(!isFilesOpen)}
+          className="w-full flex justify-between items-center px-4 py-3 bg-gray-100 font-semibold text-gray-800"
+        >
+          <span>📁 Files</span>
+          {isFilesOpen ? <FiChevronDown /> : <FiChevronRight />}
+        </button>
+        {isFilesOpen && (
+          <div>
+            {fileItems.length === 0 ? (
+              <p className="text-center text-gray-500 py-4">No files uploaded</p>
+            ) : (
+              <>
+                <div className="max-h-60 overflow-y-auto divide-y">
+                  {visibleFiles.map((file) => (
                     <div
-                        ref={dropdownRef}
-                        className="absolute bottom-16 left-4 w-80 bg-white shadow-lg rounded-lg p-3 z-50"
+                      key={file.id}
+                      className="flex justify-between items-center px-4 py-2"
                     >
-                        <DropdownItem
-                            title="Quick response"
-                            desc="Best for everyday conversation"
-                            badge="2-3 sec"
+                      <div>
+                        <p className="text-gray-800">{file.name}</p>
+                        {/* <p className="text-sm text-gray-500">{file.date}</p> */}
+                      </div>
+                      <div className="flex gap-3">
+                        <FiUpload
+                          className="text-blue-500 hover:text-blue-700 cursor-pointer"
+                          title="Upload"
+                          onClick={() => alert(`Upload for: ${file.name}`)}
                         />
-                        <DropdownItem
-                            title="Think Deeper"
-                            desc="Better for complex topics"
-                            badge="~30 sec"
-                            selected
+                        <FiTrash
+                          className="text-red-500 hover:text-red-700 cursor-pointer"
+                          title="Delete"
+                          onClick={() => alert(`Delete file: ${file.name}`)}
                         />
-                        <DropdownItem
-                            title="Deep Research"
-                            desc="Detailed + reference"
-                            badge="~10 min"
-                            newBadge
-                        />
+                      </div>
                     </div>
+                  ))}
+                </div>
+                {fileItems.length > 5 && (
+                  <button
+                    onClick={() => setFilesExpanded(!filesExpanded)}
+                    className="w-full text-sm text-blue-600 hover:underline py-2 text-center"
+                  >
+                    {filesExpanded ? "See less" : "See more"}
+                  </button>
                 )}
-            </div>
-        </div>
-    );
-}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
-function DropdownItem({ title, desc, badge, newBadge = false, selected = false }) {
-    return (
-        <div className="flex justify-between items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer">
-            <div>
-                <div className="font-medium">{title}</div>
-                <div className="text-xs text-gray-500">{desc}</div>
-            </div>
-            <div className="flex items-center gap-2">
-                {newBadge && (
-                    <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">New</span>
-                )}
-                <span className="text-xs bg-gray-200 px-2 py-0.5 rounded-full">{badge}</span>
-                <input type="radio" name="mode" checked={selected} readOnly />
-            </div>
-        </div>
-    );
-}
+export default ChatFilesAccordion;
