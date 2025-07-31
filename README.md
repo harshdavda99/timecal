@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { FiTrash, FiUpload, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import {
+  FiTrash,
+  FiUpload,
+  FiChevronDown,
+  FiChevronRight,
+} from "react-icons/fi";
 
 const ChatFilesAccordion = () => {
   const [isChatOpen, setIsChatOpen] = useState(true);
@@ -8,36 +13,36 @@ const ChatFilesAccordion = () => {
   const [filesExpanded, setFilesExpanded] = useState(false);
 
   const chatItems = [
-    { id: 1, text: "How tosss install React?" },
+    { id: 1, text: "How to install React?" },
     { id: 2, text: "Explain JSX." },
     { id: 3, text: "What is useEffect?" },
     { id: 4, text: "What is state?" },
     { id: 5, text: "Props vs State?" },
     { id: 6, text: "What is context API?" },
     { id: 7, text: "How to manage global state?" },
-    { id: 8, text: "React vs Angular?" },
-    { id: 9, text: "React performance optimization?" },
-    { id: 10, text: "Lazy loading in React?" },
+    { id: 8, text: "Explain Virtual DOM." },
+    { id: 9, text: "What is reconciliation?" },
+    { id: 10, text: "React vs Angular?" },
   ];
 
   const fileItems = [
-    { id: 1, name: "Resumes.pdf", date: "Uploaded on July 10, 2025" },
+    { id: 1, name: "Resume.pdf", date: "Uploaded on July 10, 2025" },
     { id: 2, name: "Portfolio.zip", date: "Uploaded on July 28, 2025" },
     { id: 3, name: "CoverLetter.docx", date: "Uploaded on July 29, 2025" },
     { id: 4, name: "Photo.png", date: "Uploaded on July 29, 2025" },
     { id: 5, name: "IDCard.pdf", date: "Uploaded on July 29, 2025" },
     { id: 6, name: "Certificate.pdf", date: "Uploaded on July 29, 2025" },
     { id: 7, name: "OfferLetter.pdf", date: "Uploaded on July 29, 2025" },
-    { id: 8, name: "Transcript.pdf", date: "Uploaded on July 30, 2025" },
-    { id: 9, name: "Invoice2025.pdf", date: "Uploaded on July 30, 2025" },
-    { id: 10, name: "Presentation.pptx", date: "Uploaded on July 30, 2025" },
+    { id: 8, name: "Invoice.pdf", date: "Uploaded on July 30, 2025" },
+    { id: 9, name: "Presentation.pptx", date: "Uploaded on July 30, 2025" },
+    { id: 10, name: "Notes.txt", date: "Uploaded on July 30, 2025" },
   ];
 
   const visibleChats = chatExpanded ? chatItems : chatItems.slice(0, 5);
   const visibleFiles = filesExpanded ? fileItems : fileItems.slice(0, 5);
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="flex flex-col space-y-6 p-4 h-full overflow-hidden">
       {/* Chat Section */}
       <div className="border rounded-lg overflow-hidden">
         <button
@@ -57,14 +62,25 @@ const ChatFilesAccordion = () => {
                   {visibleChats.map((chat) => (
                     <div
                       key={chat.id}
-                      className="flex justify-between items-center px-4 py-2"
+                      className="group flex justify-between items-center px-4 py-2 hover:bg-gray-50"
                     >
                       <span className="text-gray-700">{chat.text}</span>
-                      <FiTrash
-                        className="text-red-500 hover:text-red-700 cursor-pointer"
-                        title="Delete"
-                        onClick={() => alert(`Delete chat: ${chat.text}`)}
-                      />
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                        <button
+                          onClick={() => alert(`Upload: ${chat.text}`)}
+                          className="p-1 rounded-full hover:bg-blue-100 text-blue-500 hover:text-blue-700 border-none focus:outline-none focus:ring-0"
+                          title="Upload"
+                        >
+                          <FiUpload />
+                        </button>
+                        <button
+                          onClick={() => alert(`Delete chat: ${chat.text}`)}
+                          className="p-1 rounded-full hover:bg-red-100 text-red-500 hover:text-red-700 border-none focus:outline-none focus:ring-0"
+                          title="Delete"
+                        >
+                          <FiTrash />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -101,23 +117,20 @@ const ChatFilesAccordion = () => {
                   {visibleFiles.map((file) => (
                     <div
                       key={file.id}
-                      className="flex justify-between items-center px-4 py-2"
+                      className="group flex justify-between items-center px-4 py-2 hover:bg-gray-50"
                     >
                       <div>
                         <p className="text-gray-800">{file.name}</p>
-                        {/* <p className="text-sm text-gray-500">{file.date}</p> */}
+                        <p className="text-sm text-gray-500">{file.date}</p>
                       </div>
-                      <div className="flex gap-3">
-                        <FiUpload
-                          className="text-blue-500 hover:text-blue-700 cursor-pointer"
-                          title="Upload"
-                          onClick={() => alert(`Upload for: ${file.name}`)}
-                        />
-                        <FiTrash
-                          className="text-red-500 hover:text-red-700 cursor-pointer"
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                        <button
+                          onClick={() => alert(`Delete: ${file.name}`)}
+                          className="p-1 rounded-full hover:bg-red-100 text-red-500 hover:text-red-700 border-none focus:outline-none focus:ring-0"
                           title="Delete"
-                          onClick={() => alert(`Delete file: ${file.name}`)}
-                        />
+                        >
+                          <FiTrash />
+                        </button>
                       </div>
                     </div>
                   ))}
