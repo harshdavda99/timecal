@@ -1,37 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { FaRegComments, FaRegFolderOpen } from "react-icons/fa";
 import { MdClose, MdDelete, MdUpload } from "react-icons/md";
 
 const initialChats = [
-  { id: 1, title: "React Introduction" },
+  { id: 1, title: "Chat 1" },
   {
     id: 2,
-    title: "JSX Deep Dive",
+    title: "Chat 2",
     files: [
-      { id: "f1", name: "jsx-snippets.txt", date: "July 12, 2025" },
-      { id: "f2", name: "component-structure.docx", date: "July 13, 2025" },
+      { id: "f1", name: "file1.txt" },
+      { id: "f2", name: "file2.txt" },
+      { id: "f3", name: "report.pdf" },
+      { id: "f4", name: "image.png" },
+      { id: "f5", name: "design.sketch" },
+      { id: "f6", name: "doc.docx" },
+      { id: "f7", name: "notes.md" },
     ],
   },
-  { id: 3, title: "State vs Props" },
-  {
-    id: 4,
-    title: "Hooks Overview",
-    files: [
-      { id: "f3", name: "hooks-cheatsheet.pdf", date: "July 14, 2025" },
-      { id: "f4", name: "custom-hooks-guide.pdf", date: "July 15, 2025" },
-    ],
-  },
-  {
-    id: 5,
-    title: "Redux Basics",
-    files: [
-      { id: "f5", name: "redux-flow.png", date: "July 16, 2025" },
-      { id: "f6", name: "redux-notes.txt", date: "July 17, 2025" },
-    ],
-  },
-  { id: 6, title: "React Router v6" },
-  { id: 7, title: "React Context API" },
-  { id: 8, title: "Code Splitting" },
+  { id: 3, title: "Chat 3" },
+  { id: 4, title: "Chat 4" },
+  { id: 5, title: "Chat 5" },
+  { id: 6, title: "Chat 6" },
 ];
 
 export default function ChatFileAccordion() {
@@ -40,29 +29,32 @@ export default function ChatFileAccordion() {
   const [visibleFiles, setVisibleFiles] = useState([]);
   const [showAllChats, setShowAllChats] = useState(false);
   const [showAllFiles, setShowAllFiles] = useState(false);
-  const [showFileSection, setShowFileSection] = useState(false);
-  const [showUploadUI, setShowUploadUI] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [showUpload, setShowUpload] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const displayedChats = showAllChats ? chats : chats.slice(0, 5);
+  const displayedFiles = showAllFiles ? visibleFiles : visibleFiles.slice(0, 5);
 
   const handleToggleChatFiles = (chatId) => {
     const chat = chats.find((c) => c.id === chatId);
-    setOpenChatId(chatId);
-    setVisibleFiles(chat?.files || []);
-    setShowAllFiles(false);
-    setShowFileSection(true);
-    setShowUploadUI(false);
-    setSelectedFile(null);
+    const files = chat?.files || [];
+    if (openChatId === chatId) {
+      setOpenChatId(null);
+      setVisibleFiles([]);
+      setShowUpload(false);
+    } else {
+      setOpenChatId(chatId);
+      setVisibleFiles(files);
+      setShowUpload(false);
+    }
   };
 
   const removeFile = (fileId) => {
     setVisibleFiles((prev) => prev.filter((file) => file.id !== fileId));
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
+    setChats((prev) =>
+      prev.map((chat) =>
         chat.id === openChatId
-          ? {
-              ...chat,
-              files: chat.files?.filter((f) => f.id !== fileId),
-            }
+          ? { ...chat, files: chat.files?.filter((f) => f.id !== fileId) }
           : chat
       )
     );
@@ -73,202 +65,169 @@ export default function ChatFileAccordion() {
     if (openChatId === chatId) {
       setOpenChatId(null);
       setVisibleFiles([]);
-      setShowFileSection(false);
+      setShowUpload(false);
     }
   };
 
-  const uploadFileToChat = () => {
-    if (!selectedFile) return;
+  const uploadFileToChat = (file) => {
+    if (!file || !openChatId) return;
     const newFile = {
       id: `f${Date.now()}`,
-      name: selectedFile.name,
-      date: new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }),
+      name: file.name,
     };
 
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
+    setChats((prev) =>
+      prev.map((chat) =>
         chat.id === openChatId
-          ? {
-              ...chat,
-              files: chat.files ? [...chat.files, newFile] : [newFile],
-            }
+          ? { ...chat, files: [...(chat.files || []), newFile] }
           : chat
       )
     );
-
     setVisibleFiles((prev) => [...prev, newFile]);
-    setShowUploadUI(false);
-    setSelectedFile(null);
   };
 
-  const displayedChats = showAllChats ? chats : chats.slice(0, 5);
-  const displayedFiles = showAllFiles ? visibleFiles : visibleFiles.slice(0, 5);
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) uploadFileToChat(file);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) uploadFileToChat(file);
+  };
 
   return (
-    <div className="w-[350px] h-screen border-l fixed right-0 top-0 bg-[#f6f6f6] shadow-lg flex flex-col overflow-hidden">
-      {/* Chat Section */}
-      <div className="border-b">
-        <div className="bg-white px-4 py-2 flex items-center justify-center text-lg font-bold text-gray-900">
-          <FaRegComments className="mr-2" />
-          Chats
+    <div className="w-[350px] h-screen border-l bg-[#fdfdfd] p-4 flex flex-col gap-4 shadow-lg text-gray-800">
+      {/* Chat List */}
+      <div className="rounded-xl overflow-hidden">
+        <div className="flex justify-between items-center bg-white px-4 py-2 font-bold text-lg">
+          <span className="flex items-center gap-2">
+            <FaRegComments /> Conversations
+          </span>
         </div>
-
-        <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
+        <div className="max-h-[260px] overflow-y-auto">
           {displayedChats.map((chat) => (
             <div
               key={chat.id}
-              className="flex items-center justify-between px-4 py-3 border-b hover:bg-gray-100"
+              className="flex items-center justify-between px-4 py-2 bg-gray-50 hover:bg-gray-100 text-sm"
             >
-              <span className="text-sm text-gray-800 font-medium truncate">
-                {chat.title}
-              </span>
-              <div className="flex items-center gap-2">
-                {chat.files && (
-                  <button
-                    onClick={() => handleToggleChatFiles(chat.id)}
-                    title="View Files"
-                    className="p-1 hover:bg-yellow-100 rounded-full"
-                  >
-                    <FaRegFolderOpen className="text-yellow-500" />
-                  </button>
-                )}
+              <span className="truncate font-medium">{chat.title}</span>
+              <div className="flex gap-2 items-center">
+                <button
+                  onClick={() => handleToggleChatFiles(chat.id)}
+                  className="p-1 rounded-full hover:bg-yellow-100"
+                  title="Toggle Files"
+                >
+                  <FaRegFolderOpen className="text-yellow-500 text-sm" />
+                </button>
                 <button
                   onClick={() => {
-                    setShowUploadUI(true);
-                    setShowFileSection(true);
                     setOpenChatId(chat.id);
-                    setVisibleFiles(chat.files || []);
+                    const chatData = chats.find((c) => c.id === chat.id);
+                    setVisibleFiles(chatData?.files || []);
+                    setShowUpload(true);
                   }}
+                  className="p-1 rounded-full hover:bg-blue-100"
                   title="Upload File"
-                  className="p-1 hover:bg-green-100 rounded-full"
                 >
-                  <MdUpload className="text-green-500" />
+                  <MdUpload className="text-blue-600 text-sm" />
                 </button>
                 <button
                   onClick={() => deleteChat(chat.id)}
+                  className="p-1 rounded-full hover:bg-red-100"
                   title="Delete Chat"
-                  className="p-1 hover:bg-red-100 rounded-full"
                 >
-                  <MdDelete className="text-red-500" />
+                  <MdDelete className="text-red-500 text-sm" />
                 </button>
               </div>
             </div>
           ))}
         </div>
-
         {chats.length > 5 && (
           <button
-            className="w-full text-sm text-blue-600 hover:underline py-2"
             onClick={() => setShowAllChats(!showAllChats)}
+            className="w-full py-1 text-xs text-center text-blue-600 hover:underline bg-gray-50"
           >
-            {showAllChats ? "See Less" : "See More"}
+            {showAllChats ? "Load less" : "Load more"}
           </button>
         )}
       </div>
 
-      {/* Files Section */}
-      {showFileSection && openChatId && (
-        <div className="flex-1 flex flex-col">
-          <div className="bg-white px-4 py-2 flex justify-between items-center text-md font-semibold text-gray-900 border-b">
-            <div className="truncate">
-              Files for:
-              <span className="text-blue-600 ml-1">
+      {/* File Viewer */}
+      {openChatId && (
+        <div className="rounded-xl flex-1 flex flex-col overflow-hidden">
+          <div className="flex justify-between items-center bg-white px-4 py-2 font-bold text-md">
+            <span>
+              Files:{" "}
+              <span className="text-blue-600">
                 {chats.find((c) => c.id === openChatId)?.title}
               </span>
-            </div>
-            <div className="flex items-center gap-2">
-              {showUploadUI ? (
-                <button
-                  onClick={() => setShowUploadUI(false)}
-                  title="Show Files"
-                  className="p-1 hover:bg-yellow-100 rounded-full"
-                >
-                  <FaRegFolderOpen className="text-yellow-500" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowUploadUI(true)}
-                  title="Upload File"
-                  className="p-1 hover:bg-green-100 rounded-full"
-                >
-                  <MdUpload className="text-green-500" />
-                </button>
-              )}
-              <button
-                onClick={() => {
-                  setShowFileSection(false);
-                  setShowUploadUI(false);
-                  setSelectedFile(null);
-                }}
-                title="Close"
-                className="p-1 hover:bg-red-100 rounded-full"
-              >
-                <MdClose className="text-red-500" />
-              </button>
-            </div>
+            </span>
+            <button
+              onClick={() => {
+                setOpenChatId(null);
+                setVisibleFiles([]);
+                setShowUpload(false);
+              }}
+              className="p-1 hover:bg-gray-100 rounded-full"
+            >
+              <MdClose className="text-red-500 text-sm" />
+            </button>
           </div>
 
+          {/* File List */}
           <div className="flex-1 overflow-y-auto">
-            {showUploadUI ? (
-              <div className="p-4 space-y-2">
-                <input
-                  type="file"
-                  onChange={(e) => setSelectedFile(e.target.files[0])}
-                  className="block w-full text-sm text-gray-700 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
-                />
-                {selectedFile && (
-                  <div className="text-sm text-gray-700">
-                    Selected: <strong>{selectedFile.name}</strong>
-                  </div>
-                )}
+            {displayedFiles.map((file) => (
+              <div
+                key={file.id}
+                className="px-4 py-2 bg-gray-50 hover:bg-gray-100 flex justify-between items-center text-sm"
+              >
+                <div className="font-medium">{file.name}</div>
                 <button
-                  disabled={!selectedFile}
-                  onClick={uploadFileToChat}
-                  className={`w-full py-2 px-4 rounded text-white font-medium ${
-                    selectedFile
-                      ? "bg-green-500 hover:bg-green-600"
-                      : "bg-gray-300 cursor-not-allowed"
-                  }`}
+                  onClick={() => removeFile(file.id)}
+                  className="text-red-500 hover:bg-red-100 p-1 rounded-full"
                 >
-                  Upload
+                  <MdDelete className="text-sm" />
                 </button>
               </div>
-            ) : (
-              <>
-                {displayedFiles.map((file) => (
-                  <div
-                    key={file.id}
-                    className="px-4 py-2 border-b hover:bg-gray-100 flex justify-between items-center"
-                  >
-                    <div>
-                      <div className="text-sm font-medium text-gray-800">
-                        {file.name}
-                      </div>
-                      <div className="text-xs text-gray-500">{file.date}</div>
-                    </div>
-                    <button
-                      onClick={() => removeFile(file.id)}
-                      className="text-red-500 hover:bg-red-100 p-1 rounded-full"
-                    >
-                      <MdDelete />
-                    </button>
-                  </div>
-                ))}
-                {visibleFiles.length > 5 && (
-                  <button
-                    className="w-full text-sm text-blue-600 hover:underline py-2"
-                    onClick={() => setShowAllFiles(!showAllFiles)}
-                  >
-                    {showAllFiles ? "See Less" : "See More"}
-                  </button>
-                )}
-              </>
+            ))}
+            {visibleFiles.length > 5 && (
+              <button
+                onClick={() => setShowAllFiles(!showAllFiles)}
+                className="w-full py-1 text-xs text-center text-blue-600 hover:underline bg-gray-50"
+              >
+                {showAllFiles ? "Load less" : "Load more"}
+              </button>
             )}
           </div>
+
+          {/* Upload Area (visible only if triggered) */}
+          {showUpload && (
+            <div className="border-t p-4 bg-white space-y-2">
+              <div
+                className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center text-sm text-gray-600 cursor-pointer hover:border-blue-400 transition"
+                onClick={() => fileInputRef.current.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleDrop}
+              >
+                <MdUpload className="mx-auto text-2xl mb-1 text-blue-500" />
+                Drag & drop file here or click to browse
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  ref={fileInputRef}
+                  className="hidden"
+                />
+              </div>
+              <button
+                onClick={() => fileInputRef.current.click()}
+                className="w-full flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded-lg"
+              >
+                <MdUpload /> Upload File
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
