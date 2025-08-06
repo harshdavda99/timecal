@@ -1,1 +1,118 @@
+import React, { useState } from "react";
+import { FiChevronDown, FiMenu, FiX } from "react-icons/fi";
+import { Disclosure } from "@headlessui/react";
+import FlyoutMenu from "./FlyoutMenu";
+import { sidebarItems } from "./sidebarConfig";
 
+export default function Sidebar() {
+  const [isOpen, setIsOpen] = useState(true);
+  const [activeItem, setActiveItem] = useState("home");
+
+  const toggleSidebar = () => setIsOpen(!isOpen);
+
+  const menuItemStyle = (itemKey) =>
+    `flex items-center justify-between gap-3 w-full px-4 py-3 rounded-lg cursor-pointer transition-all ${activeItem === itemKey
+      ? "bg-blue-600 text-white"
+      : "text-gray-800 hover:bg-gray-100"
+    }`;
+
+  const submenuStyle = (itemKey) =>
+    `ml-4 block w-full text-left px-4 py-2 text-sm rounded-md ${activeItem === itemKey
+      ? "bg-blue-100 text-blue-700 font-medium"
+      : "text-gray-600 hover:bg-gray-100"
+    }`;
+
+  return (
+    <div className="flex">
+      <div
+        className={`h-screen bg-white shadow-md transition-all duration-300 relative ${isOpen ? "w-64" : "w-20"
+          }`}
+      >
+        {/* Top */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <button
+            onClick={toggleSidebar}
+            className="p-2 border rounded-md hover:bg-gray-100"
+          >
+            {isOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
+          </button>
+          {isOpen && <h1 className="text-lg font-bold">Dashboard</h1>}
+        </div>
+
+        {/* Menu */}
+        <div className="p-4 space-y-2">
+          {sidebarItems.map(({ key, label, icon: Icon, submenu }) => {
+            if (submenu) {
+              return (
+                <div key={key} className="relative group">
+                  <Disclosure>
+                    {({ open }) => (
+                      <>
+                        <Disclosure.Button
+                          as="div"
+                          className={menuItemStyle(key)}
+                          onClick={() => setActiveItem(key)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Icon className="text-xl" />
+                            {isOpen && <span>{label}</span>}
+                          </div>
+                          {isOpen && (
+                            <FiChevronDown
+                              className={`transition-transform ${open ? "rotate-180" : ""
+                                }`}
+                            />
+                          )}
+                        </Disclosure.Button>
+
+                        {/* Submenu (expanded mode) */}
+                        {isOpen && (
+                          <Disclosure.Panel>
+                            {submenu.map((subItem) => (
+                              <button
+                                key={subItem.key}
+                                className={submenuStyle(subItem.key)}
+                                onClick={() => setActiveItem(subItem.key)}
+                              >
+                                {subItem.label}
+                              </button>
+                            ))}
+                          </Disclosure.Panel>
+                        )}
+                      </>
+                    )}
+                  </Disclosure>
+
+                  {/* Flyout menu (collapsed mode) */}
+                  {!isOpen && (
+                    <div className="absolute top-0 left-full z-40 hidden group-hover:block">
+                      <FlyoutMenu
+                        items={submenu}
+                        activeItem={activeItem}
+                        setActiveItem={setActiveItem}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            // Regular menu item (no submenu)
+            return (
+              <div
+                key={key}
+                className={menuItemStyle(key)}
+                onClick={() => setActiveItem(key)}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className="text-xl" />
+                  {isOpen && <span>{label}</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
